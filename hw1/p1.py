@@ -5,33 +5,40 @@ import itertools
 class voting_rules:
 
     def __init__(self, profile: dict, alternatives: tuple):
+        '''
+            Initialize class
+        '''
         self.profile = profile
         self.NUM_VOTERS = len(self.profile.keys())
         self.alternatives = alternatives
 
     def plurality(self) -> str:
+        '''
+            This implements the plurality voting rule and returns the winner
+        '''
         counts = utils.count_first_choice(self.profile)
         return utils.select_winner(counts)
     
-    def single_transferable_vote(self) -> str:            
+    def single_transferable_vote(self) -> str: 
+        '''
+            This implements the STV voting rule with a tie breaking rule to determine loser
+        '''           
         num_voters = self.NUM_VOTERS
         upper_echelon = self.profile
         while True:
             counts = utils.count_first_choice(upper_echelon)
-            # print("counts {}".format(counts))
             if utils.got_majority(counts, num_voters) == True or len(counts.keys()) == 2:
                 return utils.select_winner(counts)
             lowest = utils.get_lowest_candidate(counts)
-            # break
             if len(lowest) > 1:
                 lower_echelon = utils.update_profile(lowest, upper_echelon, eliminate=False)
                 lowest = utils.tie_breaker(lowest, lower_echelon, num_voters)
-            # print("eliminating {}".format(lowest))
             upper_echelon = utils.update_profile(lowest, upper_echelon, eliminate = True)
-            # print(upper_echelon)
-            # print(num_voters)
     
     def borda_count(self) -> str:
+        '''
+            This implements the Borda count rule
+        '''
         score = {alternatives : 0 for alternatives in self.alternatives}
         for _, preferences in self.profile.items():
             score = utils.map_alternative_to_score(preferences, score)
@@ -39,7 +46,9 @@ class voting_rules:
         return utils.select_winner(score)
     
     def condorcet_winner(self) -> str:
-        
+        '''
+            This does all pair wise comparisons to determine if an alternative is preferred to ALL other alternatives
+        '''
         all_pairs = {pair: 0 for pair in itertools.combinations(self.alternatives,2)}
         mutable_alternatives = set(self.alternatives)
         for _, preference in self.profile.items():
@@ -59,9 +68,10 @@ class voting_rules:
             return remaining_candidates
         
     def copeland_winner(self) -> str:
-        
+        '''
+            This implements Copeland's voting rule 
+        '''
         all_pairs = {pair: 0 for pair in itertools.combinations(self.alternatives, 2)}
-        # print(all_pairs)
         for _, preference in self.profile.items():
             all_pairs = utils.get_pairwise_score(all_pairs, preference)
         initial = {self.alternatives[i]: i for i in range(len(self.alternatives))}
