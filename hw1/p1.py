@@ -35,9 +35,10 @@ class voting_rules:
         score = {alternatives : 0 for alternatives in self.alternatives}
         for _, preferences in self.profile.items():
             score = utils.map_alternative_to_score(preferences, score)
+            print(score)
         return utils.select_winner(score)
     
-    def condorcet_winner(self):
+    def condorcet_winner(self) -> str:
         
         all_pairs = {pair: 0 for pair in itertools.combinations(self.alternatives,2)}
         mutable_alternatives = set(self.alternatives)
@@ -57,7 +58,7 @@ class voting_rules:
             print("no clear condorcet winner")
             return remaining_candidates
         
-    def copeland_winner(self):
+    def copeland_winner(self) -> str:
         
         all_pairs = {pair: 0 for pair in itertools.combinations(self.alternatives, 2)}
         # print(all_pairs)
@@ -94,7 +95,7 @@ class utils:
         else:
             return False
         
-    def update_profile(lowest, profile: dict, eliminate: bool) -> dict:
+    def update_profile(lowest: set, profile: dict, eliminate: bool) -> dict:
         new_profile = {}
         for voter, preference in profile.items():
             if eliminate:
@@ -127,14 +128,14 @@ class utils:
             # print(mat)
             score = [sum(row) for row in mat]
             # print(score)
-            lowest_candidate = [key for key in position.keys() if position[key] == score.index(min(score))]
-            if len(lowest_candidate) == 1:
-                return lowest_candidate.pop()
+            lowest = {key for key in position.keys() if position[key] == score.index(min(score))}
+            if len(lowest) == 1:
+                return lowest.pop()
             else:
                 # Choose randomly otherwise
-                return random.choice(lowest_candidate)
+                return random.choice(lowest)
 
-    def get_pairwise_score(pairs: dict, preference: list):
+    def get_pairwise_score(pairs: dict, preference: list) -> dict:
         for pair, _ in pairs.items():
             if (preference.index(pair[0]) > preference.index(pair[1])):
                 offset = 0
@@ -143,7 +144,7 @@ class utils:
             pairs[pair] = pairs[pair] + offset 
         return pairs
     
-    def generate_matrix(pairs: dict, lowest: set, position: dict, num_voters: int):
+    def generate_matrix(pairs: dict, lowest: set, position: dict, num_voters: int) -> list:
 
         matrix = [[0 for _ in range(len(lowest))] for _ in range(len(lowest))]
         for pair, score in pairs.items():
