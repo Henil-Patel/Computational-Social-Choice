@@ -42,8 +42,30 @@ class voting_rules:
         score = {alternatives : 0 for alternatives in self.alternatives}
         for _, preferences in self.profile.items():
             score = utils.map_alternative_to_score(preferences, score)
-            print(score)
         return utils.select_winner(score)
+    
+    def approval_voting(self) -> str:
+        '''
+            This implements approval voting
+        '''
+        matrix = []
+        for idx, (_, preference) in enumerate(self.profile.items()):
+            if (idx + 1) % 2 == 0:
+                # Net zero between position 2 and 3
+                score = [(preference[elem], 1 if elem < 2 else 0) for elem in range(len(preference))]
+                score = sorted(score)
+            else:
+                # Net zero between position 4 and 5
+                score = [(preference[elem], 1 if elem < 4 else 0) for elem in range(len(preference))]
+                score = sorted(score)
+            matrix.append(score)
+
+        approval = {alternative : 0 for alternative in self.alternatives}
+        for i in range(len(matrix[0])):
+            for j in range(len(matrix)):
+                approval[matrix[j][i][0]] = approval[matrix[j][i][0]] + matrix[j][i][1]
+
+        return utils.select_winner(approval)
     
     def condorcet_winner(self) -> str:
         '''
@@ -165,8 +187,11 @@ class utils:
         return matrix 
     
     def aggregate_matrix(matrix: list) -> list:
+        '''
+            Matrix aggregator but unfortunately this is only for an N x N matrix
+        '''
         row_tally = []
-        for row in range(len(matrix)):
+        for row in range(len(matrix[0])):
             row_tally.append(sum(matrix[row]))
         
         col_tally = []
@@ -203,6 +228,9 @@ if __name__ == "__main__":
 
     borda_winner = load_rule.borda_count()
     print("Borda winner: {}" .format(borda_winner))
+
+    approval_winner = load_rule.approval_voting()
+    print("Approval winner: {}" .format(approval_winner))
 
     condorcet_winner = load_rule.condorcet_winner()
     print("Condorcet winner: {}" .format(condorcet_winner))
