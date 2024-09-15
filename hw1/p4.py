@@ -45,7 +45,8 @@ def compute_positional_score(profile: list, weight: list) -> str:
     
     
 if __name__ == "__main__":
-    # Entry point - PLEASE MAKE SURE TO SPECIFY DATASET FILE HERE
+    # Entry point - PLEASE MAKE SURE TO SPECIFY DATASET FILE HERE BY PATH
+    #               CURRENTLY THIS ASSUMES .TXT FILE EXISTS IN THE SAME DIRECTORY
     profile, weight = load_and_extract_file("dataset.txt")
     
     # Uncomment below line for printing purposes
