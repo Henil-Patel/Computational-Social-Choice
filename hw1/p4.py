@@ -35,12 +35,17 @@ def compute_positional_score(profile: list, weight: list) -> str:
         $ Output: the winning candidate
     '''
 
+    # Initialize score dictionary
     score = {element: 0 for element in profile[0]}
 
+    # Iterate by row
     for i in range(len(profile)):
+        # Iterate by col
         for j in range(len(profile[i])):
+            # Update score by weight
             score[profile[i][j]] = score[profile[i][j]] + weight[j]
-
+    # Get maximal element by value
+    print(score)
     return max(score.items(), key=lambda x: x[1])[0]
     
     
