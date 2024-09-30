@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 def generate_graph(adjacency_matrix: list, G):
     mapping = {0: 'a', 1: 'b', 2: 'c', 3: 'd', 4: 'e', 5: 'f', 6: 'g'}
     for i in range(len(adjacency_matrix)):
-        for j in range(i + 1, len(adjacency_matrix[i])):
+        for j in range(len(adjacency_matrix[i])):
             if adjacency_matrix[i][j] == 1:
                 G.add_edge(mapping[i], mapping[j])
 
@@ -12,7 +12,7 @@ def generate_graph(adjacency_matrix: list, G):
     nx.draw(G, pos, with_labels = True, node_color = "skyblue", node_size = 2000, edge_color = "black", arrows = True, font_size = 15)
     edge_labels = nx.get_edge_attributes(G, 'weight')
     nx.draw_networkx_edge_labels(G, pos, edge_labels=edge_labels)
-    print(G.out_edges())
+    print(G.out_degree())
     plt.show()
 
 if __name__ == "__main__":
