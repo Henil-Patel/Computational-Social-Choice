@@ -12,8 +12,8 @@ def generate_graph(adjacency_matrix: list, G):
     nx.draw(G, pos, with_labels = True, node_color = "skyblue", node_size = 2000, edge_color = "black", arrows = True, font_size = 15)
     edge_labels = nx.get_edge_attributes(G, 'weight')
     nx.draw_networkx_edge_labels(G, pos, edge_labels=edge_labels)
-    print(G.out_degree())
-    plt.show()
+    print(dir(G))
+    # plt.show()
 
 if __name__ == "__main__":
     adjacency_matrix = [

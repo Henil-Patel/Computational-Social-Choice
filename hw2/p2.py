@@ -1,5 +1,3 @@
-import random 
-import functools
 import itertools
 from tabulate import tabulate
 def kemeny_winner(voting_profile: dict, alternatives: tuple) -> set:
