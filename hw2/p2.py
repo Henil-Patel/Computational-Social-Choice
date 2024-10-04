@@ -1,6 +1,10 @@
 import itertools
 from tabulate import tabulate
 def kemeny_winner(voting_profile: dict, alternatives: tuple) -> set:
+    '''
+        This function computes the number of disagreements between two ballots and returns kendall-tau distance
+        It also prints a tabulated version of each disagreement
+    '''
     disagreements = lambda x, y: sum(map (lambda pair: (x.index(pair[0]) < x.index(pair[1])) != (y.index(pair[0]) < y.index(pair[1])), all_pairs))
     all_linear_orderings = tuple(itertools.permutations(alternatives))
     all_pairs = tuple(itertools.combinations(alternatives, 2))

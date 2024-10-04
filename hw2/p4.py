@@ -2,6 +2,9 @@ import networkx as nx
 import matplotlib.pyplot as plt
 
 def generate_graph(adjacency_matrix: list, G):
+    '''
+        This function just generates a graph with a respectable visual :)
+    '''
     mapping = {0: 'a', 1: 'b', 2: 'c', 3: 'd', 4: 'e', 5: 'f', 6: 'g'}
     for i in range(len(adjacency_matrix)):
         for j in range(len(adjacency_matrix[i])):
