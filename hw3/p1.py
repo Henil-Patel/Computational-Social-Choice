@@ -69,7 +69,7 @@ def compute_winning_probabilities(probability_matrix, alternatives):
     for alt, res in result.items():
         print(f"candidate {alt} has winning probability {res}")
     winner = [key for key, value in result.items() if value == max(result.values())].pop()
-    print(f"\nTherefore the winning alternative is {winner} with probability {max(result.values())}")
+    print(f"\nTherefore the winning alternative is {winner} with probability {max(result.values())}\n")
 
 
 
