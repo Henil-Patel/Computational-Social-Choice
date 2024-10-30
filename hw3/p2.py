@@ -21,11 +21,13 @@ class voting_rules:
         # Same as condorcet_winner
         for b5 in fifth_ballot:
             
+            # Add fifth profile
             self.profile.update({"v5": list(b5)})
             
             # Same as in condorcet_winner, initialize all pair dictionary
             all_pairs = {pair: 0 for pair in itertools.combinations(self.alternatives, 2)}
             
+
             for _, preference in self.profile.items():
                 all_pairs = utils.get_pairwise_score(all_pairs, preference)
 
@@ -33,12 +35,13 @@ class voting_rules:
 
             # Get a score matrix based on all pairs
             matrix = utils.generate_matrix(all_pairs, set(self.alternatives), initial, self.NUM_VOTERS)
-
+            print(matrix)
             # Tally candidates by row, tally candidates by column
             row_agg, col_agg = utils.aggregate_matrix(matrix)
 
             # Create a score dictionary that stores the difference between row aggregate - column aggregate (Copeland's defining feature) for each alternative
             diff = dict(map(lambda x, y, z: (z, x - y), row_agg, col_agg, self.alternatives))
+            print(diff)
             # Return maximal element
             yield utils.select_winner(diff)
     
