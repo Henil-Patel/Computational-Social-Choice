@@ -4,8 +4,18 @@ from fractions import Fraction
 from itertools import permutations, combinations
 
 def generate_probability_matrix(profile, alternatives):
+    '''
+        This function generates the probability matrix
+        It also creates a 'table' for visualization purposes and displays each entry as a fraction (probability of a candidate defeatig another)
+    '''
+    # Initialize Q matrix with zeros
     Q = [[0 for _ in range(len(alternatives.keys()))] for _ in range(len(alternatives.keys()))]
+    
+    # Create all pairs for alternatives this is useful for looping
     pairs = list(combinations(alternatives.keys(),2))
+    
+    # Go over each ballot and compute position of candidate i with candidate j
+    # Based on which candidate has higher ranking, increase win count
     for ballot in profile:
         for pair in pairs:
             i, j = pair[0], pair[1]
@@ -18,7 +28,7 @@ def generate_probability_matrix(profile, alternatives):
     # For data storing purposes
     data_Q = copy.deepcopy(Q)
 
-    # For display purposes
+    # For display purposes. Here show everything as a fraction
     for i in range(len(Q)):
         for j in range(len(Q[0])):
             Q[i][j] = str(Fraction(Q[i][j],len(profile)))
@@ -32,8 +42,15 @@ def generate_probability_matrix(profile, alternatives):
     return data_Q
 
 def compute_winning_probabilities(probability_matrix, alternatives):
-    
+    '''
+        This is the outer function to house the recursive 'do' function.
+        It allows us to initialize values inside of it while supplying them to the do function.
+    '''
+
     def do(x, v, Q, candidates):
+        '''
+            This is the main recursive function which computes the probability of a candidate winning.
+        '''
         # Base case
         if isinstance(v, list) and len(v) == 1 and v[0] == x:
             return 1
@@ -55,6 +72,10 @@ def compute_winning_probabilities(probability_matrix, alternatives):
         return g_x
     
     def descendants(v):
+        '''
+            This is a helper method for determining the descendants of a particular node.
+            If the node is a singleton, return that node else return the union of all the sub nodes. 
+        '''
         # Base case: Return singleton / leaf
         if len(v) == 1 and isinstance(v[0], str):
             return {v[0]}
@@ -62,9 +83,12 @@ def compute_winning_probabilities(probability_matrix, alternatives):
         elif len(v) == 2:
             return descendants(v[0]).union(descendants(v[1]))
 
+    # Define knock out tournament as T (a nested list of lists)
     T = [[[['a'],['b']],[['c'],['d']]],[[['e'],['f']],[['g'],['h']]]]
     
     print("\n")
+
+    # The rest is just for display purposes
     result = {alternative : do(alternative, T, probability_matrix, alternatives) for alternative, _ in alternatives.items()}
     for alt, res in result.items():
         print(f"candidate {alt} has winning probability {res}")
