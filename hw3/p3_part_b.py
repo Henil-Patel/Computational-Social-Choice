@@ -79,6 +79,7 @@ class modified_copeland:
                 print(mutable_matrix)
                 usable_matrix = [list(v.values()) for k, v in mutable_matrix.items()]
                 print(usable_matrix)
+                
                 new_raw_winners = self._determine_winner(usable_matrix)
                 print(new_raw_winners)
 
