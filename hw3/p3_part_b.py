@@ -31,7 +31,7 @@ class modified_copeland:
         # Get a score matrix based on all pairs
         return utils.generate_win_loss_matrix(all_pairs, set(self.alternatives), self.candidate_positions, self.NUM_VOTERS)
     
-    def _determine_winner(self, matrix):
+    def _determine_winner(self, matrix, alternatives):
         '''
             Helper for computing winner in case of Copeland voting rule
         '''
@@ -40,7 +40,7 @@ class modified_copeland:
         row_agg, col_agg = utils.get_row_col_scores(matrix)
 
         # Create a score dictionary that stores the difference between row aggregate - column aggregate (Copeland's defining feature) for each alternative
-        diff = dict(map(lambda x, y, z: (z, x - y), row_agg, col_agg, self.alternatives))
+        diff = dict(map(lambda x, y, z: (z, x - y), row_agg, col_agg, alternatives))
         # Return maximal element
         return utils.select_winner(diff)
     
@@ -52,27 +52,34 @@ class modified_copeland:
         self.matrix = self._generate_copeland_matrix()
 
         # Get scores without deletions 
-        raw_winners = self._determine_winner(self.matrix)
+        raw_winners = self._determine_winner(self.matrix, self.alternatives)
 
         # Each iteration represents target candidate to be made unique winner
         for target, idx in self.candidate_positions.items():
-            print(f"--------------TARGET {target}--------------")
-            mutable_matrix = copy.deepcopy(self.matrix)
-
+            print(f"--------------TARGET {target} {idx}--------------")
+            mutable_matrix = {i:{j: elem for j, elem in enumerate(row)} for i, row in enumerate(self.matrix)}
             target_outcome = mutable_matrix[idx]
             print(target_outcome)
-            dominant = list(map(lambda x : x[0], filter(lambda x: x[1] == 0, enumerate(target_outcome))))
-            dominion = list(map(lambda x : x[0], filter(lambda x: x[1] == 1, enumerate(target_outcome))))
+            dominant = [k for k,v in target_outcome.items() if v == 0]
+            # # Remove target to avoid comparing with itself
+            dominant.remove(idx)
+            dominion = [k for k,v in target_outcome.items() if v == 1]
             print(mutable_matrix)
-            for _ in dominant:
+            print(dominant)
+            corresponding_candidates = [k for k,v in self.candidate_positions.items() if v in dominant]
+            print(corresponding_candidates)
+            for winner in dominant:
+                _ = {k for k,v in self.candidate_positions.items() if v == winner}
+                print(f"Removing {_.pop()} : {winner}")
                 # Remove row
-                mutable_matrix.pop(_)
-                print(mutable_matrix)
+                mutable_matrix.pop(winner)
                 # Remove column
-                for row in mutable_matrix:
-                    del row[_]
+                for k,v in mutable_matrix.items():
+                    v.pop(winner)
                 print(mutable_matrix)
-                new_raw_winners = self._determine_winner(mutable_matrix)
+                usable_matrix = [list(v.values()) for k, v in mutable_matrix.items()]
+                print(usable_matrix)
+                new_raw_winners = self._determine_winner(usable_matrix)
                 print(new_raw_winners)
 
 
