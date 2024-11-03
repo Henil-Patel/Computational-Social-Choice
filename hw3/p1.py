@@ -38,7 +38,7 @@ def generate_probability_matrix(profile, alternatives):
     col_label = row_label = list(alternatives.keys())
     Q = [[row_label[i]] + row for i, row in enumerate(Q)]
     print(tabulate(Q, headers=[""] + col_label, tablefmt="grid"))
-
+    print(tabulate(data_Q, headers=[""] + col_label, tablefmt="grid"))
     return data_Q
 
 def compute_winning_probabilities(probability_matrix, alternatives):
@@ -112,4 +112,5 @@ if __name__ == "__main__":
     x.sort()
     A = {x[_]: _ for _ in range(len(x))}
     Q = generate_probability_matrix(P_1, A)
+
     compute_winning_probabilities(Q, A)
