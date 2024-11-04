@@ -41,6 +41,7 @@ class modified_copeland:
 
         # Create a score dictionary that stores the difference between row aggregate - column aggregate (Copeland's defining feature) for each alternative
         diff = dict(map(lambda x, y, z: (z, x - y), row_agg, col_agg, alternatives))
+        # print(diff)
         # Return maximal element
         return utils.select_winner(diff)
     
@@ -54,34 +55,37 @@ class modified_copeland:
         # Get scores without deletions 
         raw_winners = self._determine_winner(self.matrix, self.alternatives)
 
+        num_required_removals_to_win = {a: 0 for a in self.alternatives}
+
         # Each iteration represents target candidate to be made unique winner
         for target, idx in self.candidate_positions.items():
-            print(f"--------------TARGET {target} {idx}--------------")
+            # print(f"----------------{target}----------------")
             mutable_matrix = {i:{j: elem for j, elem in enumerate(row)} for i, row in enumerate(self.matrix)}
             target_outcome = mutable_matrix[idx]
-            print(target_outcome)
             dominant = [k for k,v in target_outcome.items() if v == 0]
             # # Remove target to avoid comparing with itself
             dominant.remove(idx)
             dominion = [k for k,v in target_outcome.items() if v == 1]
-            print(mutable_matrix)
-            print(dominant)
             corresponding_candidates = [k for k,v in self.candidate_positions.items() if v in dominant]
-            print(corresponding_candidates)
+            mutable_alternatives = list(copy.deepcopy(self.alternatives))
+            num_removals = 0
             for winner in dominant:
-                _ = {k for k,v in self.candidate_positions.items() if v == winner}
-                print(f"Removing {_.pop()} : {winner}")
+                _ = {k for k,v in self.candidate_positions.items() if v == winner}.pop()
                 # Remove row
                 mutable_matrix.pop(winner)
+                num_removals += 1
                 # Remove column
                 for k,v in mutable_matrix.items():
                     v.pop(winner)
-                print(mutable_matrix)
                 usable_matrix = [list(v.values()) for k, v in mutable_matrix.items()]
-                print(usable_matrix)
-                
-                new_raw_winners = self._determine_winner(usable_matrix)
-                print(new_raw_winners)
+                mutable_alternatives.remove(_)
+                new_raw_winners = self._determine_winner(usable_matrix, mutable_alternatives)
+                # print(new_raw_winners)
+                if target in new_raw_winners and len(new_raw_winners) == 1:
+                    num_required_removals_to_win.update({target:num_removals})
+        return num_required_removals_to_win
+            
+
 
 
     
@@ -155,9 +159,5 @@ if __name__ == "__main__":
     A_2 = tuple(string.ascii_lowercase[string.ascii_lowercase.index('a'):string.ascii_lowercase.index('i')+1])
 
     MC = modified_copeland(P_2, A_2)
-    MC.constructive_control_copeland_winner()
-
-    # Storing as a set to ensure uniqueness
-    # copeland_winner = set(MC.copeland_matrix())
-    # print(f"Not possible Copeland winners: {set(A_2).difference(copeland_winner)}")
-    # print(f"Possible Copeland winners: {copeland_winner}")
+    removals_count = MC.constructive_control_copeland_winner()
+    print(removals_count)
